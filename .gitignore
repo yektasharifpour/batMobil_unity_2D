@@ -1,0 +1,8 @@
+# Ignore everything in the project
+**
+
+# Allow folder structure
+!*/
+
+# Allow only C# scripts
+!*.cs
