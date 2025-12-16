@@ -1,34 +1,88 @@
+﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Users;
 
 public class Player : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    [SerializeField] private float forwardSpeed = 5f;
-    [SerializeField] private float maxSpeed = 10f;
-    [SerializeField] private float minSpeed;
-    [SerializeField] bool isFast = false;
+    [SerializeField] private GameObject frontLight;
+    [SerializeField] private GameObject backLight;
+
+    [SerializeField] private Sprite normalLight;
+    [SerializeField] private Sprite stealthLight;
+    [SerializeField] private Sprite alertBlueLight;
+    [SerializeField] private Sprite alertRedLight;
+
+    [SerializeField] private float changeColorTime = 1.0f;
+
+    private SpriteRenderer frontRenderer;
+    private SpriteRenderer backRenderer;
+
+    private Coroutine alertRoutine;
+
+    enum PlayerState { Normal, Stealth, Alert }
+    PlayerState currentState;
+
     void Start()
     {
-        minSpeed = forwardSpeed;
+        frontRenderer = frontLight.GetComponent<SpriteRenderer>();
+        backRenderer = backLight.GetComponent<SpriteRenderer>();
+        SetState(PlayerState.Normal);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        float moveForward = Time.deltaTime * forwardSpeed;
-        transform.Translate(moveForward,0,0);
-        if ((Input.GetKey(KeyCode.LeftShift)|| Input.GetKey(KeyCode.RightShift)) && !isFast )
-        {
-            isFast = true;
-            forwardSpeed = maxSpeed;
-        }
-        else
-        {
-            isFast= false;
-            forwardSpeed = minSpeed;
-        }
-        
+        if (Input.GetKeyDown(KeyCode.N)) SetState(PlayerState.Normal);
+        else if (Input.GetKeyDown(KeyCode.S)) SetState(PlayerState.Stealth);
+        else if (Input.GetKeyDown(KeyCode.A)) SetState(PlayerState.Alert);
     }
+
+    void SetState(PlayerState newState)
+    {
+        if (currentState == newState) return;
+
+        // اگر داریم از Alert خارج می‌شیم، کوروتینش رو قطع کن
+        if (currentState == PlayerState.Alert && alertRoutine != null)
+        {
+            StopCoroutine(alertRoutine);
+            alertRoutine = null;
+        }
+
+        currentState = newState;
+        UpdateLight();
+    }
+
+    void UpdateLight()
+    {
+        switch (currentState)
+        {
+            case PlayerState.Normal:
+                frontRenderer.sprite = normalLight;
+                backRenderer.sprite = normalLight;
+                break;
+
+            case PlayerState.Stealth:
+                frontRenderer.sprite = stealthLight;
+                backRenderer.sprite = stealthLight;
+                break;
+
+            case PlayerState.Alert:
+                // جلوگیری از چندبار شروع شدن کوروتین
+                if (alertRoutine == null)
+                    alertRoutine = StartCoroutine(AlertLightChange());
+                break;
+        }
+    }
+    IEnumerator AlertLightChange()
+    {
+        while (true)
+        {
+            frontRenderer.sprite = alertBlueLight;
+            backRenderer.sprite = alertBlueLight;
+            yield return new WaitForSeconds(changeColorTime);
+
+            frontRenderer.sprite = alertRedLight;
+            backRenderer.sprite = alertRedLight;
+            yield return new WaitForSeconds(changeColorTime);
+        }
+    }
+
 }
