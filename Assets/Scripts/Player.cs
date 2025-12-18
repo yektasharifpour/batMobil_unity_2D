@@ -3,18 +3,22 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] private GameObject frontLight;
-    [SerializeField] private GameObject backLight;
-    [SerializeField] private GameObject batSignal;
-    [SerializeField] private Sprite normalLight;
-    [SerializeField] private Sprite stealthLight;
-    [SerializeField] private Sprite alertBlueLight;
-    [SerializeField] private Sprite alertRedLight;
+    [SerializeField] private GameObject _frontLight;
+    [SerializeField] private GameObject _backLight;
+    [SerializeField] private GameObject _batSignal;
+    [SerializeField] private Sprite _normalLight;
+    [SerializeField] private Sprite _stealthLight;
+    [SerializeField] private Sprite _alertBlueLight;
+    [SerializeField] private Sprite _alertRedLight;
     [SerializeField] private Transform cam;
-    [SerializeField] private float xOffset = -20f;
-    //[SerializeField] bool turnLightOn = true;
+    [SerializeField] private float _xOffset = -20f;
+    [SerializeField] private bool _isSignalOn = false;
+    [SerializeField] private AudioSource _alert;
+   
 
-    [SerializeField] private float changeColorTime = 1.0f;
+   
+
+    [SerializeField] private float _changeColorTime = 1.0f;
 
     private SpriteRenderer frontRenderer;
     private SpriteRenderer backRenderer;
@@ -27,10 +31,12 @@ public class Player : MonoBehaviour
     void Start()
     {
         //turnLightOn = true;
-        frontRenderer = frontLight.GetComponent<SpriteRenderer>();
-        backRenderer = backLight.GetComponent<SpriteRenderer>();
+        _frontLight.gameObject.SetActive(true);
+        _backLight.gameObject.SetActive(true);
+        frontRenderer = _frontLight.GetComponent<SpriteRenderer>();
+        backRenderer = _backLight.GetComponent<SpriteRenderer>();
         SetState(PlayerState.Normal);
-        batSignal.gameObject.SetActive(false);
+        _batSignal.gameObject.SetActive(false);
         if (cam == null) cam = Camera.main.transform;
         //xOffset = transform.position.x - cam.position.x;
 
@@ -44,12 +50,21 @@ public class Player : MonoBehaviour
         if (cam == null) return;
 
           Vector3 pos = transform.position;
-    pos.x = cam.position.x + xOffset;
+    pos.x = cam.position.x + _xOffset;
     transform.position = pos;
     }
     //کنترل حالت ها و بت سیگنال
     void Update()
     {
+        if (_isSignalOn)
+        {
+            _frontLight.gameObject.SetActive(false);
+        }
+        else if(!_isSignalOn)
+        {
+            _frontLight.gameObject.SetActive(true);
+
+        }
         if (Input.GetKeyDown(KeyCode.N)) SetState(PlayerState.Normal);
         else if (Input.GetKeyDown(KeyCode.C)) SetState(PlayerState.Stealth);
         else if (Input.GetKeyDown(KeyCode.Space)) SetState(PlayerState.Alert);
@@ -66,6 +81,7 @@ public class Player : MonoBehaviour
         
         if (currentState == PlayerState.Alert && alertRoutine != null)
         {
+            _alert.Stop();
             StopCoroutine(alertRoutine);
             alertRoutine = null;
         }
@@ -80,19 +96,22 @@ public class Player : MonoBehaviour
         switch (currentState)
         {
             case PlayerState.Normal:
-                frontRenderer.sprite = normalLight;
-                backRenderer.sprite = normalLight;
+                
+                frontRenderer.sprite = _normalLight;
+                backRenderer.sprite = _normalLight;
                 break;
 
             case PlayerState.Stealth:
-                frontRenderer.sprite = stealthLight;
-                backRenderer.sprite = stealthLight;
+             frontRenderer.sprite = _stealthLight;
+                backRenderer.sprite = _stealthLight;
      
                 break;
 
             case PlayerState.Alert:
+
                 if (alertRoutine == null)
-                    alertRoutine = StartCoroutine(AlertLightChange());
+                    _alert.Play();
+                alertRoutine = StartCoroutine(AlertLightChange());
                 break;
         }
     }
@@ -102,43 +121,35 @@ public class Player : MonoBehaviour
     void turnOnBatSignal()
     {
         if (Input.GetKey(KeyCode.B))
-        {   frontLight.gameObject.SetActive(false);
-            batSignal.gameObject.SetActive(true);
+        {
+
+            _isSignalOn = true;
+            _frontLight.gameObject.SetActive(false);
+            _batSignal.gameObject.SetActive(true);
         }
         else if(Input.GetKey(KeyCode.D))
         {
-            frontLight.gameObject.SetActive(true);
-            batSignal.gameObject.SetActive(false);
+            _isSignalOn = false;
+            _frontLight.gameObject.SetActive(true);
+            _batSignal.gameObject.SetActive(false);
         }
     }
-    //void turnOffLight()
-    //{
-    //    if (!turnLightOn)
-    //    {
-    //        frontLight.gameObject.SetActive(false);
-    //        backLight.gameObject.SetActive(false);
 
-    //    }
-    //    else
-    //    {
-    //        frontLight.gameObject.SetActive(true);
-    //        backLight.gameObject.SetActive(true);
-    //    }
-    //}
 
 
     // روتین برای چشمک زن کردن چراغ در حالت هشدار
     IEnumerator AlertLightChange()
     {
+
         while (true)
         {
-            frontRenderer.sprite = alertBlueLight;
-            backRenderer.sprite = alertBlueLight;
-            yield return new WaitForSeconds(changeColorTime);
+            frontRenderer.sprite = _alertBlueLight;
+            backRenderer.sprite = _alertBlueLight;
+            yield return new WaitForSeconds(_changeColorTime);
 
-            frontRenderer.sprite = alertRedLight;
-            backRenderer.sprite = alertRedLight;
-            yield return new WaitForSeconds(changeColorTime);
+            frontRenderer.sprite = _alertRedLight;
+            backRenderer.sprite = _alertRedLight;
+            yield return new WaitForSeconds(_changeColorTime);
         }
     }
 
