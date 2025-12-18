@@ -14,9 +14,11 @@ public class Player : MonoBehaviour
     [SerializeField] private float _xOffset = -20f;
     [SerializeField] private bool _isSignalOn = false;
     [SerializeField] private AudioSource _alert;
-   
+    [SerializeField] private AudioSource _signalBat;
 
-   
+
+
+
 
     [SerializeField] private float _changeColorTime = 1.0f;
 
@@ -122,13 +124,14 @@ public class Player : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.B))
         {
-
+            _signalBat.Play();
             _isSignalOn = true;
             _frontLight.gameObject.SetActive(false);
             _batSignal.gameObject.SetActive(true);
         }
-        else if(Input.GetKey(KeyCode.D))
+        else if(Input.GetKey(KeyCode.E))
         {
+            _signalBat.Stop();
             _isSignalOn = false;
             _frontLight.gameObject.SetActive(true);
             _batSignal.gameObject.SetActive(false);
