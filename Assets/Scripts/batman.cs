@@ -29,7 +29,7 @@ public class HorizontalClamp : MonoBehaviour
 
     void Update()
     {
-        if (isHidden && Input.GetKeyDown(KeyCode.F))
+        if (isHidden && Input.GetKeyDown(KeyCode.O))
         {
             ShowBatman();
         }
