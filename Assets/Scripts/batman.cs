@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Users;
 
@@ -11,17 +12,28 @@ public class HorizontalClamp : MonoBehaviour
     [SerializeField] private float _minViewportX = 0.05f;
     [Range(0f, 1f)]
     [SerializeField] private float _maxViewportX = 0.95f;
+    [SerializeField] private float respawnTriggerDelay = 0.3f;
     private SpriteRenderer _spriteRenderer;
+    private Collider2D _collider;
+    private bool isHidden = false;
+    private float savedY;
+
 
     void Start()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
+        _collider = GetComponent<Collider2D>();
         if (_cam == null)
             _cam = Camera.main;
     }
 
     void Update()
     {
+        if (isHidden && Input.GetKeyDown(KeyCode.F))
+        {
+            ShowBatman();
+        }
+        if (isHidden) return;
         // حرکت چپ و راست
         float h = Input.GetAxis("Horizontal");
         if (h < 0f)
@@ -49,9 +61,45 @@ public class HorizontalClamp : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.tag == "Player")
+        if (other.CompareTag("Player"))
         {
-            Destroy(gameObject);
+            HideBatman();
         }
+
+    }
+    void HideBatman()
+    {
+        isHidden = true;
+        savedY = transform.position.y;
+        _spriteRenderer.enabled = false;
+        _collider.enabled = false;
+        transform.position = new Vector3(0.8759f, -4.6489f, 0);
+    }
+
+    void ShowBatman()
+    {
+        isHidden = false;
+
+        
+        Vector3 p = transform.position;   
+        float z_Dist = Mathf.Abs(_cam.transform.position.z);
+
+        Vector3 centerWorld = _cam.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, z_Dist));
+
+        p.x = centerWorld.x;  
+                               
+        p.z = 0f;
+
+        transform.position = p;
+
+        _spriteRenderer.flipX = false;
+        _spriteRenderer.enabled = true;
+        StartCoroutine(EnableColliderWithDelay());
+    }
+
+    IEnumerator EnableColliderWithDelay()
+    {
+        yield return new WaitForSeconds(respawnTriggerDelay);
+        _collider.enabled = true;
     }
 }
