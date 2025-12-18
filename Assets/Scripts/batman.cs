@@ -34,7 +34,8 @@ public class HorizontalClamp : MonoBehaviour
             ShowBatman();
         }
         if (isHidden) return;
-        // حرکت چپ و راست
+       
+
         float h = Input.GetAxis("Horizontal");
         if (h < 0f)
         {
@@ -46,10 +47,11 @@ public class HorizontalClamp : MonoBehaviour
         }
         transform.Translate(Vector3.right * h * _speed * Time.deltaTime, Space.World);
 
-        // محدود کردن داخل دید دوربین
+        
         ClampToViewport();
     }
 
+    // محدود کردن موقعیت بتمن به داخل دوربین
     void ClampToViewport()
     {
         Vector3 viewportPos = _cam.WorldToViewportPoint(transform.position);
@@ -67,6 +69,8 @@ public class HorizontalClamp : MonoBehaviour
         }
 
     }
+
+    // سوار شدن بت من در ماشین
     void HideBatman()
     {
         isHidden = true;
@@ -76,6 +80,7 @@ public class HorizontalClamp : MonoBehaviour
         transform.position = new Vector3(0.8759f, -4.6489f, 0);
     }
 
+    // نمایش بت من با فشردن کلید  O
     void ShowBatman()
     {
         isHidden = false;
