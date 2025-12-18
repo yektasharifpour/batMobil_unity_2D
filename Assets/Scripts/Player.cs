@@ -32,7 +32,7 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-        //turnLightOn = true;
+        
         _frontLight.gameObject.SetActive(true);
         _backLight.gameObject.SetActive(true);
         frontRenderer = _frontLight.GetComponent<SpriteRenderer>();
@@ -40,7 +40,7 @@ public class Player : MonoBehaviour
         SetState(PlayerState.Normal);
         _batSignal.gameObject.SetActive(false);
         if (cam == null) cam = Camera.main.transform;
-        //xOffset = transform.position.x - cam.position.x;
+        
 
 
     }
@@ -71,7 +71,7 @@ public class Player : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.C)) SetState(PlayerState.Stealth);
         else if (Input.GetKeyDown(KeyCode.Space)) SetState(PlayerState.Alert);
         turnOnBatSignal();
-        //turnOffLight();
+       
      
     }
 
