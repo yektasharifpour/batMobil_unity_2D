@@ -4,20 +4,20 @@ using UnityEngine.InputSystem.Users;
 
 public class HorizontalClamp : MonoBehaviour
 {
-    [SerializeField] private Camera cam;
-    [SerializeField] private float speed = 5f;
+    [SerializeField] private Camera _cam;
+    [SerializeField] private float _speed = 5f;
 
     [Range(0f, 1f)]
-    [SerializeField] private float minViewportX = 0.05f;
+    [SerializeField] private float _minViewportX = 0.05f;
     [Range(0f, 1f)]
-    [SerializeField] private float maxViewportX = 0.95f;
+    [SerializeField] private float _maxViewportX = 0.95f;
     private SpriteRenderer _spriteRenderer;
 
     void Start()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
-        if (cam == null)
-            cam = Camera.main;
+        if (_cam == null)
+            _cam = Camera.main;
     }
 
     void Update()
@@ -32,7 +32,7 @@ public class HorizontalClamp : MonoBehaviour
         {
             _spriteRenderer.flipX = false;  
         }
-        transform.Translate(Vector3.right * h * speed * Time.deltaTime, Space.World);
+        transform.Translate(Vector3.right * h * _speed * Time.deltaTime, Space.World);
 
         // محدود کردن داخل دید دوربین
         ClampToViewport();
@@ -40,11 +40,11 @@ public class HorizontalClamp : MonoBehaviour
 
     void ClampToViewport()
     {
-        Vector3 viewportPos = cam.WorldToViewportPoint(transform.position);
+        Vector3 viewportPos = _cam.WorldToViewportPoint(transform.position);
 
-        viewportPos.x = Mathf.Clamp(viewportPos.x, minViewportX, maxViewportX);
+        viewportPos.x = Mathf.Clamp(viewportPos.x, _minViewportX, _maxViewportX);
 
-        Vector3 worldPos = cam.ViewportToWorldPoint(viewportPos);
+        Vector3 worldPos = _cam.ViewportToWorldPoint(viewportPos);
         transform.position = worldPos;
     }
     private void OnTriggerEnter2D(Collider2D other)
